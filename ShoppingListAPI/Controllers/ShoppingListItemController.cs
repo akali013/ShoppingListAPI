@@ -47,7 +47,7 @@ namespace ShoppingListAPI.Controllers
         {
             var requestToken = Request.Cookies["refreshToken"];
             _shoppingService.DeleteUserItem(requestToken, model);
-            return Ok();
+            return Ok(new {message = "Item deleted!"});
         }
     }
 }

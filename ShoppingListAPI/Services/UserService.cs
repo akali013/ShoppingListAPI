@@ -14,6 +14,7 @@ namespace ShoppingListAPI.Services
         AuthenticateResponse RefreshToken(string token, string ipAddress);
         void RevokeToken(string token, string ipAddress);
         User GetUserById(Guid id);
+        void UpdateCredentials(string refreshToken, CredentialsRequest model);
     }
 
     public class UserService : IUserService
@@ -108,6 +109,16 @@ namespace ShoppingListAPI.Services
             }
 
             return user;
+        }
+
+        public void UpdateCredentials(string refreshToken, CredentialsRequest model)
+        {
+            User user = getUserByRefreshToken(refreshToken);
+            user.Email = model.Email;
+            user.Password = BC.HashPassword(model.Password);
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
         }
 
 

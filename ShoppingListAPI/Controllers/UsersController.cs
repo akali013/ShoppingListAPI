@@ -58,6 +58,14 @@ namespace ShoppingListAPI.Controllers
             return Ok(user.RefreshTokens);
         }
 
+        [HttpPut("credentials")]
+        public IActionResult UpdateCredentials(CredentialsRequest request)
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            _userService.UpdateCredentials(refreshToken, request);
+            return Ok(new {message = "Credentials updated!"});
+        }
+
 
         private void setTokenCookie(string token)
         {
