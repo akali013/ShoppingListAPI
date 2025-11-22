@@ -35,20 +35,34 @@ namespace ShoppingListAPI.Services
             return displayedItems;
         }
 
+        // Add a new item to the user's shopping list. If the item already exists, add to the current item's quantity.
         public ShoppingListItem AddUserItem(string refreshToken, ShoppingListItemRequest model)
         {
             User user = getUserByRefreshToken(refreshToken);
             Item item = getItemByName(model.Name);
-            var newListItem = new ShoppingListItem();
-            newListItem.UserId = user.Id;
-            newListItem.ItemId = item.Id;
-            newListItem.Quantity = model.Quantity;
-            newListItem.IsChecked = false;
 
-            _context.ShoppingListItems.Add(newListItem);
-            _context.SaveChanges();
+            ShoppingListItem? existingItem = _context.ShoppingListItems.SingleOrDefault(i => i.UserId == user.Id && i.ItemId == item.Id);
+            if (existingItem != null)
+            {
+                existingItem.Quantity += model.Quantity;
+                _context.ShoppingListItems.Update(existingItem);
+                _context.SaveChanges();
 
-            return newListItem;
+                return existingItem;
+            }
+            else
+            {
+                var newListItem = new ShoppingListItem();
+                newListItem.UserId = user.Id;
+                newListItem.ItemId = item.Id;
+                newListItem.Quantity = model.Quantity;
+                newListItem.IsChecked = false;
+
+                _context.ShoppingListItems.Add(newListItem);
+                _context.SaveChanges();
+
+                return newListItem;
+            }
         }
 
         public ShoppingListItem UpdateUserItem(string refreshToken, ShoppingListItemRequest model)
