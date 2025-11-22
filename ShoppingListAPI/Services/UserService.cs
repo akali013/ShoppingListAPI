@@ -97,7 +97,7 @@ namespace ShoppingListAPI.Services
 
             revokeRefreshToken(refreshToken, ipAddress, "Revoked without replacement");
             _context.Users.Update(user);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
 
         public User GetUserById(Guid id)
