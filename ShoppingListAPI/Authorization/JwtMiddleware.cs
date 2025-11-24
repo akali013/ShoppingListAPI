@@ -15,9 +15,10 @@ namespace ShoppingListAPI.Authorization
             _appSettings = appSettings.Value;
         }
 
+        // Check the authorization header for an access token to see if the user is authenticated
         public async Task Invoke(HttpContext context, IUserService userService, IJwtUtils jwtUtils)
         {
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();       // Bearer token
             var userId = jwtUtils.ValidateJwtToken(token);
             if (userId != null)
             {

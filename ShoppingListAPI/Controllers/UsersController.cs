@@ -66,6 +66,14 @@ namespace ShoppingListAPI.Controllers
             return Ok(new {message = "Credentials updated!"});
         }
 
+        [AllowAnonymous]
+        [HttpPost("signup")]
+        public ActionResult<User> CreateAccount(AuthenticateRequest request)
+        {
+            var user = _userService.CreateAccount(request);
+            return Ok(user);
+        }
+
 
         private void setTokenCookie(string token)
         {

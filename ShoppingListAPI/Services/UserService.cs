@@ -15,6 +15,7 @@ namespace ShoppingListAPI.Services
         void RevokeToken(string token, string ipAddress);
         User GetUserById(Guid id);
         void UpdateCredentials(string refreshToken, CredentialsRequest model);
+        User CreateAccount(AuthenticateRequest model);
     }
 
     public class UserService : IUserService
@@ -119,6 +120,15 @@ namespace ShoppingListAPI.Services
 
             _context.Users.Update(user);
             _context.SaveChanges();
+        }
+
+        public User CreateAccount(AuthenticateRequest model)
+        {
+            User newUser = new User(model);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return newUser;
         }
 
 
