@@ -1,25 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShoppingListAPI.Data;
 using System.Text.Json.Serialization;
+using BC = BCrypt.Net.BCrypt;
 
 namespace ShoppingListAPI.Models
 {
     public class User
     {
-        private static ShoppingListAPIContext _context;
+        private ShoppingListAPIContext _context;
+
         public User(ShoppingListAPIContext context)
         {
             _context = context;
         }
 
-        //public async Task LoadRefreshTokens()
-        //{
-        //    var refreshTokens = await _context.RefreshTokens.ToArrayAsync();
-
-        //    var tokens = refreshTokens.Where(token => token.UserId == this.Id).ToList();
-
-        //    this.RefreshTokens = tokens;
-        //}
+        // Constructor for creating new users
+        public User(AuthenticateRequest model)
+        {
+            Id = Guid.NewGuid();
+            Email = model.Email;
+            Password = BC.HashPassword(model.Password);
+            RefreshTokens = new List<RefreshToken>();
+        }
 
         public Guid Id { get; set; }
         public string Email { get; set; }
