@@ -14,7 +14,7 @@ services:
       db:
         condition: service_healthy
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest   
+    image: mcr.microsoft.com/mssql/server:2022-latest
     restart: always
     volumes:
       - db-data:/var/opt/mssql

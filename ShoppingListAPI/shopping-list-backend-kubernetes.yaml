@@ -1,33 +1,35 @@
+# Based on this tutorial: https://docs.docker.com/guides/dotnet/deploy/
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: server
-  name: server
+    service: shopping-list-api
+  name: shopping-list-api
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: server
+      service: shopping-list-api
   strategy: {}
   template:
     metadata:
       labels:
-        service: server
+        service: shopping-list-api
     spec: 
-      initContainers:
-        - name: wait-for-db
-          image: busybox:1.28
-          command:
-            [
-              "sh",
-              "-c",
-              'until nc -zv db 1433; do echo "Waiting for db..."; sleep 2; done;'
-            ]
+      # initContainers:
+      #   - name: wait-for-db
+      #     image: busybox:1.28
+      #     command:
+      #       [
+      #         "sh",
+      #         "-c",
+      #         'until nc -zv db 1433; do echo "Waiting for db..."; sleep 2; done;'
+      #       ]
       containers:
         - image: akali013/shopping-list-backend:latest
-          name: server
+          name: shopping-list-api
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -35,7 +37,92 @@ spec:
               protocol: TCP
           env:
             - name: AppSettings__Secret
-              value: "ab2b0225-cc79-431e-aa89-1b2f99391c1b4cc449bc-997b-4136-8c07-4fc0a1fb5642efef1f83-a75f-4ba5-bf63-ab49e7a7030e9d7ac716-c0b7-4a35-8b80-461c2513f30fea4d4f91-a1b7-485b-9352-b1c23ba4b3e9"
-            - name: ConnectionStrings__DefaultConnection
-              value: "Server=db;Database=ShoppingListDb;User=sa;Password=Your_password123;"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SECRET
+            - name: ConnectionStrings__ShoppingListAPIContext
+              value: "Server=shopping-list-db,1433;Database=master;MultipleActiveResultSets=true;TrustServerCertificate=True;User Id=sa;Password=${SA_PASSWORD};"
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SA_PASSWORD
           resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: shopping-list-db
+  name: shopping-list-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: shopping-list-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: shopping-list-db
+    spec:
+      containers:
+        - env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SA_PASSWORD
+            - name: MSSQL_PID
+              value: "Express"
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          name: shopping-list-db
+          ports:
+            - containerPort: 1433
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: shopping-list-api-service
+  name: shopping-list-api-service
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - name: "8081"
+      port: 8081
+      targetPort: 8081
+      nodePort: 30002
+  selector:
+    service: shopping-list-api
+status:
+    loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: shopping-list-db-service
+  name: shopping-list-db-service
+  namespace: default
+spec:
+  ports:
+    - name: "1433"
+      port: 1433
+      targetPort: 1433
+  selector:
+    service: shopping-list-db
+status:
+  loadBalancer: {}
