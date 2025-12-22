@@ -8,7 +8,7 @@ services:
     ports:
       - 8081:8080
     environment:
-        AppSettings__Secret: ab2b0225-cc79-431e-aa89-1b2f99391c1b4cc449bc-997b-4136-8c07-4fc0a1fb5642efef1f83-a75f-4ba5-bf63-ab49e7a7030e9d7ac716-c0b7-4a35-8b80-461c2513f30fea4d4f91-a1b7-485b-9352-b1c23ba4b3e9
+        AppSettings__Secret: ${SECRET}
         ConnectionStrings__ShoppingListAPIContext: Server=db,1433;Database=master;MultipleActiveResultSets=true;TrustServerCertificate=True;User Id=sa;Password=${SA_PASSWORD};
     depends_on:
       db:

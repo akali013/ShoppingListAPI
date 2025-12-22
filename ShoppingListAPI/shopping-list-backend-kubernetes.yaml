@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: server
+  name: server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: server
+    spec: 
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command:
+            [
+              "sh",
+              "-c",
+              'until nc -zv db 1433; do echo "Waiting for db..."; sleep 2; done;'
+            ]
+      containers:
+        - image: akali013/shopping-list-backend:latest
+          name: server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              hostPort: 8081
+              protocol: TCP
+          env:
+            - name: AppSettings__Secret
+              value: "ab2b0225-cc79-431e-aa89-1b2f99391c1b4cc449bc-997b-4136-8c07-4fc0a1fb5642efef1f83-a75f-4ba5-bf63-ab49e7a7030e9d7ac716-c0b7-4a35-8b80-461c2513f30fea4d4f91-a1b7-485b-9352-b1c23ba4b3e9"
+            - name: ConnectionStrings__DefaultConnection
+              value: "Server=db;Database=ShoppingListDb;User=sa;Password=Your_password123;"
+          resources: {}
