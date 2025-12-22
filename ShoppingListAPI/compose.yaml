@@ -1,0 +1,37 @@
+# Based on this tutorial: https://docs.docker.com/guides/dotnet/develop/
+
+services:
+  server:
+    build:
+      context: .
+      target: final
+    ports:
+      - 8081:8080
+    environment:
+        AppSettings__Secret: ab2b0225-cc79-431e-aa89-1b2f99391c1b4cc449bc-997b-4136-8c07-4fc0a1fb5642efef1f83-a75f-4ba5-bf63-ab49e7a7030e9d7ac716-c0b7-4a35-8b80-461c2513f30fea4d4f91-a1b7-485b-9352-b1c23ba4b3e9
+        ConnectionStrings__ShoppingListAPIContext: Server=db,1433;Database=master;MultipleActiveResultSets=true;TrustServerCertificate=True;User Id=sa;Password=${SA_PASSWORD};
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest   
+    restart: always
+    volumes:
+      - db-data:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Express
+    expose:
+      - 1433
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "pgrep sqlservr || exit 1"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+volumes:
+  db-data:
