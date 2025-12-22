@@ -27,4 +27,4 @@ jobs:
           target: final
           context: ./ShoppingListAPI
           file: ./ShoppingListAPI/Dockerfile
-          tags: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          tags: ${{ vars.DOCKER_USERNAME }}/shopping-list-backend:latest
