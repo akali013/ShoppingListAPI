@@ -4,6 +4,7 @@ using ShoppingListAPI.Authorization;
 using ShoppingListAPI.Data;
 using ShoppingListAPI.Helpers;
 using ShoppingListAPI.Services;
+using System;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 var AllowSpecificOrigins = "_AllowSpecificOrigins";
@@ -14,19 +15,30 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: AllowSpecificOrigins,
             policy =>
             {
-                policy.WithOrigins("http://localhost:4200")
+                policy.WithOrigins("http://localhost:8080")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
             }
-        );
+    );
 });
 
 // Add services to the container.
 // JWT system created by: https://jasonwatmore.com/net-6-jwt-authentication-with-refresh-tokens-tutorial-with-example-api
 builder.Services.AddDbContext<ShoppingListAPIContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingListAPIContext") ?? throw new InvalidOperationException("Connection string 'ShoppingListAPIContext' not found.")));
-builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("ShoppingListAPIContext") ?? throw new InvalidOperationException("Connection string 'ShoppingListAPIContext' not found."),
+        sql => sql.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )
+    )
+);
+builder.Services.AddControllers().AddJsonOptions(x => {
+    x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    x.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+ });
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -43,7 +55,17 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Migrate the database during startup so the ShoppingList database exists.
+// Also seed initial item data.
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var context = scope.ServiceProvider.GetRequiredService<ShoppingListAPIContext>();
+    await DatabaseMigrator.MigrateDatabaseAsync(app.Services, logger);
+    await DatabaseMigrator.SeedItemsAsync(context);
+}
+
+//app.UseHttpsRedirection();
 
 app.UseCors(AllowSpecificOrigins);
 
@@ -55,9 +77,5 @@ app.UseMiddleware<JwtMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
-
-Console.WriteLine(Guid.NewGuid());
-Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("password123"));
-Console.WriteLine(Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));
 
 app.Run();

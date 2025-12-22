@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 ShoppingListAPI/appsettings*.json
+ShoppingListAPI/.env
