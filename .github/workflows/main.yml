@@ -1,5 +1,5 @@
 # Based on: https://docs.docker.com/guides/dotnet/configure-ci-cd/
-name: ci
+name: Docker Image CI/CD
 
 on:
   push:
