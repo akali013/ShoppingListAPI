@@ -9,13 +9,13 @@ WORKDIR /source
 
 # This is the architecture you’re building for, which is passed in by the builder.
 # Placing it here allows the previous steps to be cached across architectures.
-ARG TARGETARCH
-ARG TARGETOS
+# ARG TARGETARCH
+# ARG TARGETOS
 
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -r ${TARGETOS}-${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
+    dotnet publish -r linux-x64 --use-current-runtime --self-contained false -o /app
 
 ################################################################################
 # Create a new stage for running the application that contains the minimal
