@@ -7,7 +7,7 @@ This is the backend of the [Shopping List app](https://github.com/akali013/shopp
 
 ## How to Run
 > [!Note]
-> Before proceeding, make sure you have a container runtime like Docker Desktop.
+> Before proceeding, make sure you have a container runtime like [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 1. Clone this repository via `git clone https://github.com/akali013/shopping-list` in a terminal.
 2. Navigate to the `shopping-list` directory with `cd .\shopping-list\` in a terminal.
