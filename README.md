@@ -14,4 +14,4 @@ This is the backend of the [Shopping List app](https://github.com/akali013/shopp
 3. Run `docker compose up --build -d`.
 
 ## Credits
-[Backend JWT Authentication](https://jasonwatmore.com/net-6-jwt-authentication-with-refresh-tokens-tutorial-with-example-api) by Jason Watmore
+- [Backend JWT Authentication](https://jasonwatmore.com/net-6-jwt-authentication-with-refresh-tokens-tutorial-with-example-api) by Jason Watmore
