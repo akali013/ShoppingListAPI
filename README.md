@@ -11,7 +11,8 @@ This is the backend of the [Shopping List app](https://github.com/akali013/shopp
 
 1. Clone this repository via `git clone https://github.com/akali013/ShoppingListAPI` in a terminal.
 2. Navigate to the `ShoppingListAPI/ShoppingListAPI` directory with `cd .\ShoppingListAPI\ShoppingListAPI\` in a terminal.
-3. Run `docker compose up --build -d`.
+3. Copy the required environment variables with `cp .env-template .env` in a terminal.
+4. Run `docker compose up --build -d`.
 
 ## Credits
 - [Backend JWT Authentication](https://jasonwatmore.com/net-6-jwt-authentication-with-refresh-tokens-tutorial-with-example-api) by Jason Watmore
