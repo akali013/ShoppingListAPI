@@ -9,8 +9,8 @@ This is the backend of the [Shopping List app](https://github.com/akali013/shopp
 > [!Note]
 > Before proceeding, make sure you have a container runtime like [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-1. Clone this repository via `git clone https://github.com/akali013/shopping-list` in a terminal.
-2. Navigate to the `ShoppingListAPI` directory with `cd .\ShoppingListAPI\` in a terminal.
+1. Clone this repository via `git clone https://github.com/akali013/ShoppingListAPI` in a terminal.
+2. Navigate to the `ShoppingListAPI/ShoppingListAPI` directory with `cd .\ShoppingListAPI\ShoppingListAPI\` in a terminal.
 3. Run `docker compose up --build -d`.
 
 ## Credits
